@@ -11,8 +11,8 @@ export async function POST(req, res){
             currency: 'USD'
           },
           headers: {
-            'X-RapidAPI-Key': '95314bd545msh61623b65eab6a7dp1966b0jsncf504e37ede6',
-            'X-RapidAPI-Host': 'airbnb-search.p.rapidapi.com'
+            'X-RapidAPI-Key': process.env.RAPID_API_KEY,
+            'X-RapidAPI-Host': process.env.RAPID_API_HOST
           }
     })
     // console.log(data?.data.data)
