@@ -4,26 +4,28 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import Image from 'next/image';
 import { CatagoryData } from '@/public/catagoryData';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 const CatagorySlider = () => {
-
-    const router = useRouter()
-
     const [catagoryData, setCatagoryData] = useState([]);
     const [activeCatagory, setActiveCatagory] = useState(null)
+
+    const router = useRouter()
+    const searchParams = useSearchParams()
+    const {replace} = useRouter()
+    const pathname = usePathname()
 
     useEffect(()=> {
         // getCatagoryData()
         setCatagoryData(CatagoryData.data)
-    }, [])
+    }, []);
 
-    const getCatagoryData = () => {
-        axios.get('https://airbnb-com1.p.rapidapi.com/categories', {
+    const getCatagoryData = async () => {
+        await axios.get('https://airbnb-search.p.rapidapi.com/categories', {
             headers: {
                 'X-RapidAPI-Key': process.env.RAPID_API_KEY,
-                'X-RapidAPI-Host': 'airbnb-com1.p.rapidapi.com'
+                'X-RapidAPI-Host': process.env.RAPID_API_HOST
               }
         })
         .then((res)=> {
@@ -37,8 +39,15 @@ const CatagorySlider = () => {
     const handleCatagorySearch = (catagory) => {
         //console.log(catagory.id)
         setActiveCatagory(catagory.id)
-        // router.push(`catagory/${catagory.id}`)
-        // Link
+
+        //setting the useSearchParams hook
+        const params = new URLSearchParams(searchParams);
+        if(catagory){
+            params.set('catagory', catagory.id)
+        } else{
+            params.delete('catagory')
+        }
+        replace(`${pathname}?${params.toString()}`)
     }
     
 
@@ -47,7 +56,7 @@ const CatagorySlider = () => {
     <section className='mt-4 flex gap-10 overflow-scroll no-scrollbar border-b border-gray-200 drop-shadow-md'>
         {
             catagoryData?.map((catagory) => (
-                <Link href={`/catagory/${catagory.id}`}>
+                
                 <div 
                     onClick={()=>handleCatagorySearch(catagory)} 
                     key={catagory.value} 
@@ -57,14 +66,13 @@ const CatagorySlider = () => {
                          pb-2`}
                 >
                     <Image 
-                        src={catagory.imageUrl} 
+                        src={catagory.image} 
                         height={22} 
                         width={22} 
                         alt='icon' 
                         className="mx-auto"/>
                     <p className='text-xs text-nowrap'>{catagory.title}</p>
                 </div>
-                </Link>
             ))
         }
     </section>
