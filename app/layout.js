@@ -15,10 +15,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <header className='px-6 py-2'>
+        {/* <header className='px-6 py-2'>
           <Header />
           <CatagorySlider />
-        </header>
+        </header> */}
         {children}
       </body>
     </html>
