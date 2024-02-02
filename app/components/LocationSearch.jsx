@@ -17,7 +17,6 @@ const LocationSearch = ({ location, setLocation }) => {
   const handleLocation = async () => {
     if (location?.length > 4) {
       setTimeout(async () => {
-        // console.log(location)
         // Fetch the api here
         await axios
           .post("/api/location/", {

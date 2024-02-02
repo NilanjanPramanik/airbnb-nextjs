@@ -1,41 +1,79 @@
-'use client'
+"use client";
 
 import axios, { CanceledError } from "axios";
-import { useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import HotelCard from "./HotelCard";
+import { useStore } from "../lib/store";
 
-const MainContainer = () => {
-    const [searchedData, setSearchedData] = useState([])
+const MainContainer = ({ hotelData }) => {
+  const searchParams = useSearchParams();
+  const params = searchParams.get("catagory");
+  const { searchedHotels, hotelsCatagory, setHotelsCatagory } = useStore();
 
-    const searchParams = useSearchParams();
-    const params = searchParams.get('catagory')
-    // console.log(params)
+  const [searchedData, setSearchedData] = useState([]);
+  const [hotels, setHotels] = useState([]);
 
-    useEffect(()=> {
-        axios.post('/api/catagory-results', {
-            catagory: params
-        })
-        .then((res)=> {
-            console.log(res.data.data)
-            setSearchedData(res?.data.data)
-        }).catch((err) => {
-            console.error(err)
-        })
-    }, [params])
+  useEffect(() => {
+    axios
+      .post("/api/catagory-results", {
+        catagory: params,
+      })
+      .then((res) => {
+        // console.log(res.data);
+        // setHotelsCatagory(res?.data.data.homes)
+        setHotels(res?.data.data.homes);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+
+    setHotels(searchedHotels.homes);
+    // setHotels(hotelsCatagory)
+  }, [params, searchedHotels]);
+
+  // console.log("hotels data", searchedHotels)
 
   return (
-    <div className="grid grid-cols-2 gap-5">
-        {/* api limit is overflow
+    <div>
+      {/* api limit is overflow
         {searchedData && searchedData.map((hotel, _id)=> (
             <HotelCard key={_id} hotelData={hotel}/>
         ))} */}
-        <HotelCard />
-        <HotelCard />
-        <HotelCard />
-        <HotelCard />
-    </div>
-  )
-}
+      {searchedHotels ? (
+        <div className="flex flex-col justify-center items-center lg:grid grid-cols-2 gap-5 px-6 gap-y-10">
+        {searchedHotels?.homes?.map((home, id) => (
+          <HotelCard key={id} hotelData={home} />
+        ))}
+      </div>
+      ) : (
+        hotelsCatagory ? (
+          <div className="flex flex-col justify-center items-center lg:grid grid-cols-2 gap-5 px-6">
+            {hotels?.map((home, id) => (
+              <HotelCard key={id} hotelData={home} />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-5 px-6">
+            loading ...
+          </div>
+        )
 
-export default MainContainer
+      )}
+
+      {hotels ? (
+        <div className="flex flex-col justify-center items-center lg:grid grid-cols-2 gap-5 px-6">
+          {hotels?.map((home, id) => (
+            <HotelCard key={id} hotelData={home} />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-5 px-6">
+          loading ...
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default MainContainer;

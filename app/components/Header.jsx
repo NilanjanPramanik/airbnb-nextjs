@@ -9,6 +9,7 @@ import {
 import React, { useEffect, useState } from "react";
 import LocationSearch from "./LocationSearch";
 import DatePicker from "./DatePicker";
+import { useStore } from "../lib/store";
 
 const MobileSearch = ({
   setMobileSearch,
@@ -19,6 +20,7 @@ const MobileSearch = ({
   const [isWhereActive, setWhereActive] = useState(true);
   const [isWhenActive, setWhenActive] = useState(false);
   const [isWhoActive, setWhoActive] = useState(false);
+  const [isNext, setNext] = useState(false);
 
   const [location, setLocation] = useState("");
 
@@ -28,7 +30,7 @@ const MobileSearch = ({
 
   // console.log(startDate, endDate)
   return (
-    <div className="flex flex-col gap-3 h-[100vh] ">
+    <div className="flex flex-col gap-3 h-[100vh]">
       <XCircleIcon
         onClick={() => setMobileSearch(false)}
         className="w-8 h-8 cursor-pointer"
@@ -73,13 +75,17 @@ const MobileSearch = ({
           <div className="flex flex-col">
             <h1 className="text-xl font-semibold">When's your trip?</h1>
             <div className=" w-[100px] pt-4">
-              <DatePicker setStartDate={setStartDate} setEndDate={setEndDate} />
+              <DatePicker
+                setStartDate={setStartDate}
+                setEndDate={setEndDate}
+                setNext={setNext}
+              />
             </div>
           </div>
         ) : (
           <>
             <h2 className="text-xl font-semibold">When</h2>
-            <p className="my-auto">Add date</p>
+            <p className="my-auto">{"Add date"}</p>
           </>
         )}
       </div>
@@ -145,21 +151,38 @@ const MobileSearch = ({
   );
 };
 
-const Header = ({ setLocation, setStartDate, setEndDate }) => {
+
+
+const Header = ({ setLocation, setStartDate, setEndDate, handleSearch }) => {
   const [isMobileSearch, setMobileSearch] = useState(false); // by default this state be false
+
+  const bear = useStore((state) => state.bears)
+  const incpop = useStore((state) => state.increasePopulation)
 
   const handleMobileSearch = () => {
     setMobileSearch(true);
   };
+
+  
   return (
-    <section>
+    <section className=" relative">
       {isMobileSearch ? (
-        <MobileSearch
-          setMobileSearch={setMobileSearch}
-          sendLocation={setLocation}
-          setStartDate={setStartDate}
-          setEndDate={setEndDate}
-        />
+        <div className="flex flex-col fixed h-[100vh] w-[100vw] z-10 bg-white top-0 left-0 p-6">
+          <MobileSearch
+            setMobileSearch={setMobileSearch}
+            sendLocation={setLocation}
+            setStartDate={setStartDate}
+            setEndDate={setEndDate}
+          />
+          <div className="mx-auto flex flex-row">
+            <button
+              className=" border border-red-500 rounded-full p-2 hover:bg-red-300"
+              onClick={handleSearch}
+            >
+              <MagnifyingGlassIcon className="h-8 w-8 text-red-500" />
+            </button>
+          </div>
+        </div>
       ) : (
         <div
           onClick={() => handleMobileSearch()}
